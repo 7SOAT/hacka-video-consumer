@@ -1,0 +1,93 @@
+﻿# Ignorar arquivos de build e binários
+[Bb]in/
+[Oo]bj/
+
+# Ignorar arquivos de usuário do Visual Studio
+*.user
+*.suo
+*.userprefs
+
+# Ignorar arquivos de cache do Visual Studio
+.vs/
+.vscode/
+
+# Ignorar arquivos de log e diagnóstico
+*.log
+*.nupkg
+*.pdb
+*.idb
+
+# Ignorar arquivos de teste
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+
+# Ignorar pacotes NuGet
+[Nn]uget/
+*.nupkg
+packages/
+
+# Ignorar arquivos de configuração local
+appsettings.Development.json
+appsettings.Local.json
+
+# Ignorar arquivos de publicação
+publish/
+
+# Ignorar arquivos de ReSharper
+_ReSharper.*
+*.resharper
+
+# Ignorar arquivos do Rider
+.idea/
+
+# Ignorar arquivos do Azure Functions
+func/
+
+# Ignorar arquivos do Docker
+docker-compose.yml
+docker-compose.override.yml
+.dockerignore
+
+# Ignorar arquivos do Node.js (caso use frontend com Node)
+node_modules/
+npm-debug.log
+
+# Ignorar arquivos do macOS
+.DS_Store
+
+# Ignorar arquivos do Linux/Unix
+*~
+*.swp
+
+# Ignorar arquivos do Windows
+Thumbs.db
+Desktop.ini
+
+# Ignorar arquivos de backup
+*.bak
+*.tmp
+*.temp
+
+# Ignorar arquivos de projeto específicos
+*.csproj.user
+*.vbproj.user
+*.fsproj.user
+
+# Ignorar arquivos de configuração local (se houver)
+local.settings.json
+
+# Ignorar arquivos de teste específicos
+*.testsettings
+*.testlog
+
+# Ignorar arquivos de análise estática
+*.ruleset
+*.analyzer
+
+# Ignorar arquivos de cobertura de código
+coverage/
+*.coverage
+*.coveragexml
+
+# Ignorar arquivos de cache do dotnet
+.dotnet/
