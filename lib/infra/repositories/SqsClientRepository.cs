@@ -1,14 +1,22 @@
 ﻿using System.Net;
+using System.Text.Json;
 using Amazon.SQS;
 using Amazon.SQS.Model;
+using hacka_video_consumer.lib.adapters.controllers;
+using hacka_video_consumer.lib.adapters.controllers.ports;
+using hacka_video_consumer.lib.adapters.gateways;
+using hacka_video_consumer.lib.core.entities;
 
 namespace hacka_video_consumer;
 
-public class SqsConsumerService : BackgroundService
+public class SqsClientRepository : BackgroundService
 {
     private readonly IAmazonSQS _sqs;
-    public SqsConsumerService(IAmazonSQS sqs){
+    private readonly IFrameExtractorControllerPorts _frameExtractorController;
+    public SqsClientRepository(IAmazonSQS sqs, IFrameExtractorControllerPorts frameExtractorController)
+    {
         _sqs = sqs;
+        _frameExtractorController = frameExtractorController;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -29,6 +37,8 @@ public class SqsConsumerService : BackgroundService
             foreach (var message in messageResponse.Messages)
             {
                 Console.WriteLine(message.Body);
+                IVideoData json = JsonSerializer.Deserialize<IVideoData>(message.Body);
+                await _frameExtractorController.Execute(json);
                 await _sqs.DeleteMessageAsync(receiveRequest.QueueUrl, message.ReceiptHandle, stoppingToken);
             }
         }
