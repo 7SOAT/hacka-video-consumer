@@ -12,4 +12,8 @@
     <PackageReference Include="AWSSDK.SQS" Version="3.7.400.85" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="lib\adapters\gateways\S3Uploader.cs" />
+  </ItemGroup>
+
 </Project>
