@@ -59,7 +59,7 @@ jobs:
           aws-session-token: ${{ github.event.inputs.aws-session-token }}
           aws-region: ${{ github.event.inputs.aws-region }}
           video-processing-queue-url: ${{ secrets.VIDEO_PROCESSING_QUEUE_URL }}
-          notification-queue-url: ${{ secrets.NOTIFICATION_QUEUE_URL }}
+          notification-queue-url: ${{ secrets.NOTIFICATION_QUEUE_URL }}          
 
       - name: Set up kubectl
         uses: azure/setup-kubectl@v3
@@ -77,8 +77,8 @@ jobs:
             --from-literal=AWS_ACCESS_KEY_ID=${{ github.event.inputs.aws-access-key-id }} \
             --from-literal=AWS_SECRET_ACCESS_KEY=${{ github.event.inputs.aws-secret-access-key }} \
             --from-literal=AWS_SESSION_TOKEN=${{ github.event.inputs.aws-session-token }} \
-            --from-literal=VIDEO_PROCESSING_QUEUE_URL=${{ github.event.inputs.video-processing-queue-url }} \
-            --from-literal=NOTIFICATION_QUEUE_URL=${{ github.event.inputs.notification-queue-url }} \
+            --from-literal=VIDEO_PROCESSING_QUEUE_URL=${{ secrets.video-processing-queue-url }} \
+            --from-literal=NOTIFICATION_QUEUE_URL=${{ secrets.notification-queue-url }} \
             --dry-run=client -o yaml | kubectl apply -f -
       
       - name: Deploy to Kubernetes
