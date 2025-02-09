@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hacka-video-consumer-config-map
+  namespace: default
+data:
+  NODE_ENV: "production"  
+  VIDEOS_BUCKET_NAME: "afluga-hacka-videos-storage"
+  FRAMES_BUCKET_NAME: "afluga-hacka-frames-storage"

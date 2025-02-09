@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hacka-video-consumer-deployment
+  labels:
+    app: hacka-video-consumer-app
+spec:
+  replicas: 1  # Número de réplicas/pods que serão criadas
+  selector:
+    matchLabels:
+      app: hacka-video-consumer-app
+  template:
+    metadata:
+      labels:
+        app: hacka-video-consumer-app
+    spec:
+      containers:
+      - name: hacka-video-consumer-app
+        image: luizpainodev/hacka-video-consumer:latest
+        envFrom:
+        - configMapRef:
+            name: hacka-video-consumer-config-map
+        - secretRef:
+            name: hacka-video-consumer-secrets
+        ports:
+        - containerPort: 3000  # Porta em que sua aplicação escuta
