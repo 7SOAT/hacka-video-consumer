@@ -72,7 +72,7 @@ jobs:
 
       - name: Create Kubernetes Secret
         run: |
-          kubectl create secret generic hacka-video-secrets \
+          kubectl create secret generic hacka-video-consumer-secrets \
             --from-literal=AWS_REGION=${{ github.event.inputs.aws-region }} \
             --from-literal=AWS_ACCESS_KEY_ID=${{ github.event.inputs.aws-access-key-id }} \
             --from-literal=AWS_SECRET_ACCESS_KEY=${{ github.event.inputs.aws-secret-access-key }} \
