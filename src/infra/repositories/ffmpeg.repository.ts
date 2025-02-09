@@ -3,26 +3,24 @@ import path from 'path';
 import fs from 'fs';
 
 export class FfmpegRepository {
-    static async extractFrames(filePath: string, fps = 1) {
+    static async extractFrames(filePath: string, fps = 1): Promise<string> {
+        console.log(`⛏️ Iniciando extracao dos frames.`, JSON.stringify({ filePath, fps }))
         const outputDir = path.join(process.cwd(), "temp", "frames");
-        return new Promise(async (resolve, reject) => {
+        return await new Promise(async (resolve, reject) => {
             if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
-            const ffmpegPath = path.join(process.cwd(), "../devops/installers/ffmpeg.dll");
-            const ffprobePath = path.join(process.cwd(), "../devops/installers/ffprobe.dll");
-            ffmpeg.setFfmpegPath(ffmpegPath);
-            ffmpeg.setFfprobePath(ffprobePath);
+            
             ffmpeg(filePath)
-                .output(path.join(outputDir, "frame-%04d.jpeg"))
-                .outputOptions([`-vf fps=${fps}`])
-                .on("end", () => {
-                    console.log(`✅ Frames extraídos em: ${outputDir}`);
-                    resolve(outputDir);
-                })
-                .on("error", (err) => {
-                    console.error("❌ Erro ao extrair frames:", err);
-                    reject(err);
-                })
-                .run();
+            .output(path.join(outputDir, "frame-%04d.jpeg"))
+            .outputOptions([`-vf fps=${fps}`])
+            .on("end", () => {
+                console.log(`✅ Frames extraidos em: ${outputDir}`);
+                resolve(outputDir);
+            })
+            .on("error", (err) => {
+                console.error("😿 Erro ao extrair frames:", JSON.stringify(err));
+                reject(err);
+            })
+            .run();            
         })
     }
 }

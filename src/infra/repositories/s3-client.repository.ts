@@ -1,10 +1,28 @@
-import {GetObjectCommand, S3Client} from '@aws-sdk/client-s3'
+import {GetObjectCommand, PutObjectCommand, S3Client} from '@aws-sdk/client-s3'
+import { Upload } from '@aws-sdk/lib-storage';
 import fs from 'fs-extra';
 import * as path from "node:path";
 
-export class S3ClientRepository {
+export class S3ClientRepository {    
+    private _s3Client: S3Client;
 
-    private static async streamToBuffer(stream: any) {
+    constructor(
+        private _region: string,
+        private _accessKeyID: string,
+        private _secretAccessKey: string,
+        private _sessionToken: string,
+    ) { 
+        this._s3Client = new S3Client({
+            region: this._region,
+            credentials: {
+                accessKeyId: this._accessKeyID || '',
+                secretAccessKey: this._secretAccessKey || '',
+                sessionToken: this._sessionToken || ''
+            }
+        });
+    }
+    
+    private async streamToBuffer(stream: any) {
         const chunks = [];
         for await (const chunk of stream) {
             chunks.push(chunk);
@@ -12,33 +30,50 @@ export class S3ClientRepository {
         return Buffer.concat(chunks);
     }
 
-    static async download(objectKey: string): Promise<string> {
-        console.log("Object Key",objectKey);
+    async download(bucket: string, objectKey: string): Promise<string> {
+        console.log(`⬇️ Baixando video: ${bucket}/${objectKey} `);
         const tempDir = path.join(process.cwd(), "temp");
         await fs.ensureDir(tempDir);
-        const filePath = path.join(tempDir, path.basename(objectKey));
-
-        const s3Client = new S3Client({
-            region: 'us-east-1',
-            credentials: {
-                accessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
-                secretAccessKey: process.env.SECRET_ACCESS_KEY || '',
-                sessionToken: process.env.SESSION_TOKEN || ''
-            }
-        })
+        const filePath = path.join(tempDir, path.basename(objectKey));        
 
         const input = {
-            "Bucket": process.env.VIDEOS_BUCKET_NAME,
+            "Bucket": bucket,
             "Key": objectKey
         };
         const command = new GetObjectCommand(input);
-        const { Body } = await s3Client.send(command);
+        const { Body } = await this._s3Client.send(command);
 
         const buffer = await this.streamToBuffer(Body);
 
         fs.writeFileSync(filePath, buffer);
 
-        console.log(`✅ Arquivo salvo em: ${filePath}`);
+        console.log(`✅ Video salvo em: ${filePath}`);
         return filePath;
+    }
+
+    async uploadFile({ bucket, key, filePath }: UploadParams): Promise<void> {
+        console.log(`⬆️ Iniciando upload do .zip: ${bucket}/${key}`)
+        const fileStream = fs.createReadStream(filePath);
+
+        const upload = new Upload({
+            client: this._s3Client,
+            params: {
+                Bucket: bucket,
+                Key: key,
+                Body: fileStream,
+                ContentType: 'application/zip'
+            }
+        })
+
+        upload.on("httpUploadProgress", (progress) => {
+            console.log("🚀 Upload Progress:", JSON.stringify(progress));
+        });
+        
+        try {
+        const result = await upload.done();
+            console.log(`✅ .zip salvo no S3: ${bucket}/${key}`, JSON.stringify(result));
+        } catch (error) {
+            console.error("😿 Upload Error:", JSON.stringify(error));
+        }        
     }
 }
