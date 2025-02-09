@@ -8,36 +8,37 @@ import { VideoProcessingMessage } from './core/entities/video-processing-message
 require('dotenv').config();
 
 const handleMessage = async (message: Message) => {
-    try {
-        console.log(`✉️ Nova mensagem`, message);
+    new Promise(async (resolve, reject) => {
+        try {
+            console.log(`✉️ Nova mensagem`, message);        
+            const s3Repository = new S3ClientRepository(
+                process.env.AWS_REGION!,
+                process.env.AWS_ACCESS_KEY_ID!,
+                process.env.AWS_SECRET_ACCESS_KEY!,
+                process.env.AWS_SESSION_TOKEN!
+            );
+            
+            const videoData: VideoProcessingMessage = JSON.parse(message?.Body || "");
+                    
+            const filePath: string = await s3Repository.download(
+                process.env.VIDEOS_BUCKET_NAME!,
+                videoData.s3key
+            );
 
-        const s3Repository = new S3ClientRepository(
-            process.env.AWS_REGION!,
-            process.env.AWS_ACCESS_KEY_ID!,
-            process.env.AWS_SECRET_ACCESS_KEY!,
-            process.env.AWS_SESSION_TOKEN!
-        );
-        
-        const videoData: VideoProcessingMessage = JSON.parse(message?.Body || "");
-                
-        const filePath: string = await s3Repository.download(
-            process.env.VIDEOS_BUCKET_NAME!,
-            videoData.s3key
-        );
+            const framesDir = await FfmpegRepository.extractFrames(filePath, 1);
+            const zipPath = await ZipRepository.zipDirectory(framesDir);
 
-        const framesDir = await FfmpegRepository.extractFrames(filePath, 1);
-        const zipPath = await ZipRepository.zipDirectory(framesDir);
-
-        await s3Repository.uploadFile({
-            bucket: process.env.FRAMES_BUCKET_NAME!,
-            key: `${videoData.userId}/${videoData.videoId}/frames.zip`,
-            filePath: zipPath
-        });
-
-        console.log("✅ Processo finalizado com sucesso!");
-    } catch (error) {
-        console.error("❌ Erro no processamento:", error);
-    }
+            await s3Repository.uploadFile({
+                bucket: process.env.FRAMES_BUCKET_NAME!,
+                key: `${videoData.userId}/${videoData.videoId}/frames.zip`,
+                filePath: zipPath
+            });
+            resolve(null);
+            console.log("✅ Processo finalizado com sucesso!");
+        } catch (error) {
+            console.error("❌ Erro no processamento:", error);
+        }
+    })
 };
 
 const app = Consumer.create({
