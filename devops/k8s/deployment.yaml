@@ -15,7 +15,7 @@ spec:
         app: hacka-video-consumer-app
     spec:
       nodeSelector:
-        node-group: consumer-node-group
+        eks.amazonaws.com/nodegroup: consumer-node-group
       containers:
       - name: hacka-video-consumer-app
         image: luizpainodev/hacka-video-consumer:latest
