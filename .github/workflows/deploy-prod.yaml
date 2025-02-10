@@ -77,6 +77,8 @@ jobs:
             --from-literal=AWS_SESSION_TOKEN=${{ github.event.inputs.aws-session-token }} \
             --from-literal=VIDEO_PROCESSING_QUEUE_URL=${{ secrets.VIDEO_PROCESSING_QUEUE_URL }} \
             --from-literal=NOTIFICATION_QUEUE_URL=${{ secrets.NOTIFICATION_QUEUE_URL }} \
+            --from-literal=VIDEO_SERVICE_URL=${{ secrets.VIDEO_SERVICE_URL }} \
+            --from-literal=VIDEO_NOTIFICATION_QUEUE_URL=${{ secrets.VIDEO_NOTIFICATION_QUEUE_URL }} \
             --dry-run=client -o yaml | kubectl apply -f -
       
       - name: Deploy to Kubernetes
