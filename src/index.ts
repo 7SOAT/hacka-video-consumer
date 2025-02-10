@@ -42,7 +42,7 @@ const handleMessage = async (message: Message) => {
     const apiService = new ApiService(process.env.VIDEO_SERVICE_URL || "");
 
     const response = await apiService.put(
-      `/${videoData.videoId}/user/${videoData.userId}`,
+      `/v1/${videoData.videoId}/user/${videoData.userId}`,
       {
         s3Key: videoData.s3Key,
         status: "completed",
