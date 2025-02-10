@@ -1,5 +1,5 @@
 export interface VideoProcessingMessage {
-  s3key: string;
+  s3Key: string;
   userId: string;
   videoId: string;
 }

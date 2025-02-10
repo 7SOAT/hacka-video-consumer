@@ -12,7 +12,7 @@ require("dotenv").config();
 
 const handleMessage = async (message: Message) => {
   try {
-    logger.info(`📦 Initializing new message`, message);
+    logger.info(`📦 Initializing new message ${JSON.stringify(message)}`);
     const s3Repository = new S3ClientRepository(
       process.env.AWS_REGION!,
       process.env.AWS_ACCESS_KEY_ID!,
@@ -20,12 +20,11 @@ const handleMessage = async (message: Message) => {
       process.env.AWS_SESSION_TOKEN!
     );
 
-      const videoData: VideoProcessingMessage = JSON.parse(message.Body || "");
-      logger.info(`📦 Initializing new message`, videoData);
+    const videoData: VideoProcessingMessage = JSON.parse(message?.Body || "");
 
     const filePath: string = await s3Repository.download(
       process.env.VIDEOS_BUCKET_NAME!,
-      videoData.s3key
+      videoData.s3Key
     );
 
     logger.info(`📦 Downloaded file from S3: ${filePath}`);
@@ -45,7 +44,7 @@ const handleMessage = async (message: Message) => {
     const response = await apiService.put(
       `/${videoData.videoId}/user/${videoData.userId}`,
       {
-        s3Key: videoData.s3key,
+        s3Key: videoData.s3Key,
         status: "completed",
         s3ZipKey: `${videoData.userId}/${videoData.videoId}/frames.zip`,
       }
