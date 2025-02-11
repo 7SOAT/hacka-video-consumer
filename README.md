@@ -33,8 +33,8 @@ src
   <li>
     <h3>Clonando o repositório</h3>
 
-    git clone https://github.com/7SOAT/hacka-upload-service.git
-    cd hacka-upload-service
+    git clone https://github.com/7SOAT/hacka-video-consumer.git
+    cd hacka-video-consumer
   </li>
   <li>
     <h3>Instalar bibliotecas</h3>
