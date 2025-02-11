@@ -13,25 +13,15 @@
 ```
 devops
 ├── docker
-├── k8s
-└── terraform
+└── k8s
 src
-├── adapters
-|   ├── controllers
-|   ├── gateways
-|   ├── presenters
-├── application
-|   ├── dtos
-|   ├── ports
-|   ├── use-cases
-├── config
-|   ├── ports
 ├── core
-|   ├── enums
+|   ├── entities
+|   ├── utils
 ├── infra
-|   ├── api
-|   ├── data-sources
+|   ├── aws
 |   ├── repositories
+|   ├── services
 └── main.ts
 ```
 
