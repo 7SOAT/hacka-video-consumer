@@ -43,17 +43,15 @@ src
     npm install
   </li>
   <li>
-    <h3>Rodar instâncias no Docker</h3>
-    <p>Para rodar as instâncias do banco e da aplicação no Docker, a maneira mais simples é utilizar a extensão do VSCode, explicada no gif abaixo:</p>
-    <img src="https://code.visualstudio.com/assets/docs/containers/overview/select-subset.gif">
-    <p>Ou se preferir pode ser feito pelo terminal com:</p>
+    <h3> Rodar instâncias no Docker 🚢</h3>
+    <p>No terminal rode o seguinte código:</p>
     <p> - Para windows:</p>
 
-      docker-compose up --build
+      docker build -t hacka-video-consumer-latest -f devops/docker/dockerfile .
 
    <p> - Para Linux/macOS</p>
 
-     docker compose up --build
+     sudo docker build -t hacka-video-consumer-latest -f devops/docker/dockerfile .
 
 
   <li>
