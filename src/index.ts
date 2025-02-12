@@ -7,10 +7,17 @@ import { VideoProcessingMessage } from "./core/entities/video-processing-message
 import { logger } from "./core/utils/logger";
 import ApiService from "./infra/service/api.service";
 import SQSService from "./infra/aws/sqs.service";
+import { log } from "node:console";
 
 require("dotenv").config();
 
 const handleMessage = async (message: Message) => {
+  const videoData: VideoProcessingMessage = JSON.parse(message?.Body || "");
+
+  const apiService = new ApiService(process.env.VIDEO_SERVICE_URL || "");
+
+  const sqsService = new SQSService();
+
   try {
     logger.info(`📦 Initializing new message ${JSON.stringify(message)}`);
     const s3Repository = new S3ClientRepository(
@@ -19,8 +26,6 @@ const handleMessage = async (message: Message) => {
       process.env.AWS_SECRET_ACCESS_KEY!,
       process.env.AWS_SESSION_TOKEN!
     );
-
-    const videoData: VideoProcessingMessage = JSON.parse(message?.Body || "");
 
     const filePath: string = await s3Repository.download(
       process.env.VIDEOS_BUCKET_NAME!,
@@ -39,7 +44,6 @@ const handleMessage = async (message: Message) => {
       filePath: zipPath,
     });
 
-    const apiService = new ApiService(process.env.VIDEO_SERVICE_URL || "");
 
     const response = await apiService.put(
       `/videos`,
@@ -53,7 +57,6 @@ const handleMessage = async (message: Message) => {
     );
     logger.info(`📦 Updated video status: ${JSON.stringify(response)}`);
 
-    const sqsService = new SQSService();
 
     await sqsService.sendMessage({
       userId: response.userId,
@@ -66,6 +69,24 @@ const handleMessage = async (message: Message) => {
     logger.info(`📦 Uploaded zip file to S3: ${zipPath}`);
   } catch (error) {
     logger.error(`📦 Error processing message: ${error}`);
+
+    apiService.put('videos', {
+      userId: videoData.userId,
+      id: videoData.videoId,
+      s3Key: videoData.s3Key,
+      status: 'failed',
+    });
+    logger.info(`📦 Updated video status to failed`);
+
+    await sqsService.sendMessage({
+      userId: videoData.userId,
+      s3Key: videoData.s3Key,
+      typeEmail: "videoError",
+      subject: "Video with error",
+    });
+
+    logger.info(`📦 Sent email to user when video is failed`);
+
     throw error;
   }
 };
